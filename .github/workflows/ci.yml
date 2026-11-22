@@ -2,10 +2,12 @@ name: CI
 
 on:
   push:
-    branches: ["main"]
+    # `terrahome` is the tadnir/contrack fork's branch: upstream main plus the
+    # fork's features. A push there builds ghcr.io/tadnir/contrack:terrahome.
+    branches: ["main", "terrahome"]
     tags: ["v*"]
   pull_request:
-    branches: ["main"]
+    branches: ["main", "terrahome"]
   # Manual re-run.
   workflow_dispatch:
 
@@ -269,7 +271,7 @@ jobs:
   # documents for splitting a build across runners.
   build-image:
     needs: [checks, unit-tests, coverage, browser-a11y]
-    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v'))
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/terrahome' || startsWith(github.ref, 'refs/tags/v'))
     runs-on: ${{ matrix.runner }}
     timeout-minutes: 30
     permissions:
@@ -366,6 +368,7 @@ jobs:
           images: ghcr.io/${{ github.repository }}
           tags: |
             type=raw,value=latest,enable={{is_default_branch}}
+            type=raw,value=terrahome,enable=${{ github.ref == 'refs/heads/terrahome' }}
             type=sha,prefix=,format=short
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
