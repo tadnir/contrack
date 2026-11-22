@@ -763,6 +763,41 @@ export const dedupeSuggestions = sqliteTable(
   }),
 );
 
+/**
+ * contact_connections: how one contact relates to another of the same
+ * owner, such as "sister" or "colleague". Read as "contactId is the <type> of
+ * relatedContactId".
+ */
+export const contactConnections = sqliteTable(
+  "contact_connections",
+  {
+    id: text("id").primaryKey(),
+    contactId: text("contactId")
+      .notNull()
+      .references(() => contacts.id, { onDelete: "cascade" }),
+    relatedContactId: text("relatedContactId")
+      .notNull()
+      .references(() => contacts.id, { onDelete: "cascade" }),
+    type: text("type").notNull(),
+    createdAt: text("createdAt").default(sql`(CURRENT_TIMESTAMP)`),
+    /** Owning account, denormalized from contactId. */
+    ownerId: text("ownerId").references(() => users.id, {
+      onDelete: "restrict",
+    }),
+  },
+  (t) => ({
+    ownerContactIdx: index("idx_contact_connections_owner_contact").on(
+      t.ownerId,
+      t.contactId,
+    ),
+    ownerRelatedIdx: index("idx_contact_connections_owner_related").on(
+      t.ownerId,
+      t.relatedContactId,
+    ),
+    pairType: unique().on(t.contactId, t.relatedContactId, t.type),
+  }),
+);
+
 /** dedupe_exclusions: pairs a person dismissed, never suggested again. */
 export const dedupeExclusions = sqliteTable(
   "dedupe_exclusions",

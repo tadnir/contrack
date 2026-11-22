@@ -16,6 +16,7 @@ import { geoRoutes } from "./geo.ts";
 import { interactionRoutes } from "./interactions.ts";
 import { jobRoutes } from "./jobs.ts";
 import { listRoutes } from "./lists.ts";
+import { networkRoutes } from "./network.ts";
 import { queryRoutes } from "./query.ts";
 import type { RouteContract } from "./route.ts";
 import { tagRoutes } from "./tags.ts";
@@ -41,6 +42,7 @@ export const CONTRACTS: readonly RouteContract[] = [
   ...Object.values(interactionRoutes),
   ...Object.values(jobRoutes),
   ...Object.values(listRoutes),
+  ...Object.values(networkRoutes),
   ...Object.values(queryRoutes),
   ...Object.values(tagRoutes),
   ...Object.values(tokenRoutes),

@@ -833,6 +833,36 @@
         }
       }
     },
+    "/api/connections/{id}": {
+      "delete": {
+        "summary": "Remove a connection",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean", "const": true }
+                  },
+                  "required": ["success"],
+                  "additionalProperties": false
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/contacts": {
       "get": {
         "summary": "Every contact in the network. `view=slim` answers the list view rows instead of whole contacts",
@@ -2110,6 +2140,72 @@
                   "required": ["points"],
                   "additionalProperties": false
                 }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/contacts/{id}/connections": {
+      "get": {
+        "summary": "The connections the person stated for this contact, both ways",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/Connection" }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "State how this contact is connected to another, such as their sister",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "relatedContactId": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 200
+                  },
+                  "type": { "type": "string", "minLength": 1, "maxLength": 50 }
+                },
+                "required": ["relatedContactId", "type"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Connection" }
               }
             }
           }
@@ -4399,6 +4495,30 @@
         }
       }
     },
+    "/api/network": {
+      "get": {
+        "summary": "Every contact with a tie to another, the stated connections, and the contacts who share notes",
+        "parameters": [
+          {
+            "name": "minShared",
+            "in": "query",
+            "required": false,
+            "description": "1 to 50, 1 when absent: how many notes two contacts share before the network draws a tie",
+            "schema": { "type": "string", "pattern": "^\\d+$" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Network" }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/query/contacts": {
       "get": {
         "summary": "Contacts as raw rows, newest first. Trashed, merged and ghost contacts are left out",
@@ -4939,6 +5059,41 @@
         ],
         "additionalProperties": false
       },
+      "Connection": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "contactId": { "type": "string" },
+          "type": { "type": "string" },
+          "direction": { "type": "string", "enum": ["out", "in"] },
+          "other": {
+            "type": "object",
+            "properties": {
+              "id": { "type": "string" },
+              "name": { "type": "string" },
+              "avatarUrl": { "type": ["string", "null"] }
+            },
+            "required": ["id", "name", "avatarUrl"],
+            "additionalProperties": false
+          },
+          "createdAt": { "type": ["string", "null"] },
+          "ownerId": {
+            "type": "string",
+            "description": "Internal. May be removed in a later version.",
+            "deprecated": true
+          }
+        },
+        "required": [
+          "id",
+          "contactId",
+          "type",
+          "direction",
+          "other",
+          "createdAt",
+          "ownerId"
+        ],
+        "additionalProperties": false
+      },
       "Contact": {
         "type": "object",
         "properties": {
@@ -5397,6 +5552,69 @@
           "message": { "type": "string" }
         },
         "required": ["type", "entity", "message"],
+        "additionalProperties": false
+      },
+      "Network": {
+        "type": "object",
+        "properties": {
+          "nodes": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/NetworkNode" }
+          },
+          "edges": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/NetworkEdge" }
+          },
+          "lists": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": { "type": "string" },
+                "name": { "type": "string" },
+                "icon": { "type": "string" }
+              },
+              "required": ["id", "name", "icon"],
+              "additionalProperties": false
+            }
+          }
+        },
+        "required": ["nodes", "edges", "lists"],
+        "additionalProperties": false
+      },
+      "NetworkEdge": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "source": { "type": "string" },
+          "target": { "type": "string" },
+          "kind": { "type": "string", "enum": ["connection", "shared"] },
+          "label": { "type": "string" },
+          "weight": { "type": "integer" }
+        },
+        "required": ["id", "source", "target", "kind", "label", "weight"],
+        "additionalProperties": false
+      },
+      "NetworkNode": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "name": { "type": "string" },
+          "avatarUrl": { "type": ["string", "null"] },
+          "themeColor": { "type": ["string", "null"] },
+          "company": { "type": ["string", "null"] },
+          "score": { "type": ["number", "null"] },
+          "listIds": { "type": "array", "items": { "type": "string" } }
+        },
+        "required": [
+          "id",
+          "name",
+          "avatarUrl",
+          "themeColor",
+          "company",
+          "score",
+          "listIds"
+        ],
         "additionalProperties": false
       },
       "NotOnMapContact": {

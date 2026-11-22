@@ -958,6 +958,25 @@ export const ROUTE_MANIFEST: readonly RouteEntry[] = [
     class: "scoped",
     isolated: true,
   },
+  {
+    method: "GET",
+    path: "/api/contacts/:id/connections",
+    class: "scoped",
+    isolated: true,
+  },
+  {
+    method: "POST",
+    path: "/api/contacts/:id/connections",
+    class: "scoped",
+    isolated: true,
+  },
+  {
+    method: "DELETE",
+    path: "/api/connections/:id",
+    class: "scoped",
+    isolated: true,
+  },
+  { method: "GET", path: "/api/network", class: "scoped", isolated: true },
   { method: "GET", path: "/api/lists", class: "scoped", isolated: true },
   { method: "POST", path: "/api/lists", class: "scoped", isolated: true },
   {

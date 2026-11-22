@@ -615,6 +615,7 @@ export function purgeOwner(ownerId: string): void {
       "score_snapshots",
       "dedupe_suggestions",
       "dedupe_exclusions",
+      "contact_connections",
       "dedupe_merge_log",
       "ai_invocations",
       "action_items",
