@@ -26,6 +26,10 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - A WhatsApp connector logs the days you messaged each contact in a direct
   chat, from a whatsapp-mcp server you run. It reads per-day message counts
   only, never message text or groups.
+- Connections: say how two contacts know each other, such as "sister" or
+  "colleague", on a contact's page. The new Connections page in Pulse draws
+  the network: the connections you stated, and the contacts who share notes,
+  meetings or messages, with a filter by list.
 - AVIF photos, and HEIC photos, the format an iPhone takes, work in an
   import, as a contact's photo and as your account photo. Your browser turns
   each into a JPEG before it sends it, so the server still reads no HEIF

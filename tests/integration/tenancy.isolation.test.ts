@@ -126,6 +126,7 @@ const app = makeTestApp();
 const COVERED = [
   "DELETE /api/action-items/:id",
   "DELETE /api/contacts/:id",
+  "DELETE /api/connections/:id",
   "DELETE /api/connectors/:id",
   "DELETE /api/interactions/:id",
   "DELETE /api/lists/:id",
@@ -152,6 +153,7 @@ const COVERED = [
   "GET /api/contacts",
   "GET /api/contacts/:id",
   "GET /api/contacts/:id/action-items",
+  "GET /api/contacts/:id/connections",
   "GET /api/contacts/:id/relationships",
   "GET /api/contacts/:id/score",
   "GET /api/contacts/:id/timeline",
@@ -182,6 +184,7 @@ const COVERED = [
   "GET /api/lists",
   "GET /api/lists/:id/contacts",
   "GET /api/map/views",
+  "GET /api/network",
   "GET /api/mcp",
   "GET /api/query/contacts",
   "GET /api/search",
@@ -209,6 +212,7 @@ const COVERED = [
   "POST /api/contacts",
   "POST /api/contacts/:id/action-items",
   "POST /api/contacts/:id/attachments",
+  "POST /api/contacts/:id/connections",
   "POST /api/contacts/:id/avatar",
   "POST /api/contacts/:id/briefing",
   "POST /api/contacts/:id/enrich",
@@ -3852,8 +3856,87 @@ describe("all scoped routes are isolated", () => {
       .filter((r) => r.method === "GET" && !r.path.includes("/:"))
       .map(key);
     // Each is covered above. The count makes a new collection route show in
-    // this file's diff: 44 after removing GET /api/contacts/map.
-    expect(collections).toHaveLength(44);
+    // this file's diff: 45 after adding GET /api/network.
+    expect(collections).toHaveLength(45);
     for (const k of collections) expect(COVERED).toContain(k);
+  });
+});
+
+// Connections and the network
+
+describe("connections and the network", () => {
+  let connectionA: string;
+
+  it("POST /api/contacts/:id/connections links two of A's contacts", async () => {
+    const res = await asUser(A)(
+      request(app)
+        .post(`/api/contacts/${seedA.contactIds[0]}/connections`)
+        .send({ relatedContactId: seedA.contactIds[1], type: "sister" }),
+    );
+    expect(res.status).toBe(201);
+    expect(res.body.other.id).toBe(seedA.contactIds[1]);
+    expect(snapshotRow("contact_connections", res.body.id)?.ownerId).toBe(
+      A.user.id,
+    );
+    connectionA = res.body.id;
+  });
+
+  it("POST refuses a foreign contact on either side, and writes nothing", async () => {
+    const before = rowsOwnedBy("contact_connections", B.user.id);
+    const foreignParent = await asUser(B)(
+      request(app)
+        .post(`/api/contacts/${seedA.contactIds[0]}/connections`)
+        .send({ relatedContactId: seedB.contactIds[0], type: "friend" }),
+    );
+    const foreignOther = await asUser(B)(
+      request(app)
+        .post(`/api/contacts/${seedB.contactIds[0]}/connections`)
+        .send({ relatedContactId: seedA.contactIds[0], type: "friend" }),
+    );
+    expect(foreignParent.status).toBe(404);
+    expect(foreignOther.status).toBe(404);
+    expect(rowsOwnedBy("contact_connections", B.user.id)).toBe(before);
+  });
+
+  it("GET /api/contacts/:id/connections refuses a foreign contact", async () => {
+    const res = await asUser(B)(
+      request(app).get(`/api/contacts/${seedA.contactIds[0]}/connections`),
+    );
+    expect(res.status).toBe(404);
+    const own = await asUser(A)(
+      request(app).get(`/api/contacts/${seedA.contactIds[1]}/connections`),
+    );
+    expect(own.status).toBe(200);
+    expect(own.body.map((c: { id: string }) => c.id)).toEqual([connectionA]);
+    expect(own.body[0].direction).toBe("in");
+  });
+
+  it("GET /api/network shows each owner only their own ties", async () => {
+    const forA = await asUser(A)(request(app).get("/api/network"));
+    const forC = await asUser(C)(request(app).get("/api/network"));
+    expect(forA.status).toBe(200);
+    expect(
+      forA.body.edges.some((e: { id: string }) => e.id === `c-${connectionA}`),
+    ).toBe(true);
+    const aIds = new Set(seedA.contactIds);
+    for (const node of forA.body.nodes) expect(aIds.has(node.id)).toBe(true);
+    expect(forC.body).toEqual({ nodes: [], edges: [], lists: [] });
+  });
+
+  it("DELETE /api/connections/:id answers a foreign id like an unknown one", async () => {
+    const foreign = await asUser(B)(
+      request(app).delete(`/api/connections/${connectionA}`),
+    );
+    const unknown = await asUser(B)(
+      request(app).delete(`/api/connections/${randomId()}`),
+    );
+    expect(foreign.status).toBe(404);
+    expect(foreign.body.error.message).toEqual(unknown.body.error.message);
+    expect(snapshotRow("contact_connections", connectionA)).toBeTruthy();
+    const own = await asUser(A)(
+      request(app).delete(`/api/connections/${connectionA}`),
+    );
+    expect(own.status).toBe(200);
+    expect(snapshotRow("contact_connections", connectionA)).toBeFalsy();
   });
 });

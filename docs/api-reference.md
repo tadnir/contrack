@@ -797,6 +797,20 @@ sends `nextFollowUpAt` changes the follow-ups, and the field follows them. A
 date moves the earliest open follow-up to that date, or adds a "Follow up"
 when there is none. `null` completes the open follow-ups.
 
+## Connections
+
+A connection is a tie you state between two of your contacts, such as "Dana
+is Avi's sister". It shows on both contacts. The network adds the ties
+Contrack sees on its own: contacts who appear on the same notes, meetings or
+messages.
+
+| Endpoint                             | What it does                                                                                                                                                                                                                                                                                             | Access    |
+| ------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------- |
+| `GET /api/contacts/:id/connections`  | The connections of one contact, both ways. Each row has `type`, `direction` (`out`: this contact is the `type` of the other; `in`: the other is the `type` of this one) and the `other` contact.                                                                                                         | your data |
+| `POST /api/contacts/:id/connections` | State a connection: `{ relatedContactId, type }`, `type` 1 to 50 characters. `201` with the connection. `409` when the two already have that type. `404` when either contact is not yours.                                                                                                               | your data |
+| `DELETE /api/connections/:id`        | Remove a connection.                                                                                                                                                                                                                                                                                     | your data |
+| `GET /api/network`                   | Every active contact with a tie to another, as `nodes`, and the ties as `edges`: `kind` is `connection` or `shared`, and `weight` is how many notes a shared pair has. `minShared` 1 to 50, default 1: how many notes two contacts share before they are tied. Also answers your `lists`, for filtering. | your data |
+
 ## Lists
 
 | Endpoint                                   | What it does                                                                                                                                                        | Access    |

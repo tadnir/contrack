@@ -61,6 +61,7 @@ import {
 import { useTrackShortcut } from "./useTrackShortcut";
 import { ContactTags } from "./ContactTags";
 import { DetailsCard, type DetailRequest } from "./DetailsCard";
+import { ConnectionsCard } from "./ConnectionsCard";
 import type { ResearchAnchor } from "../../../lib/research";
 /** Card-shaped stand-in, so a tab switch or the first load shows no empty pane. */
 const CardsFallback = () => (
@@ -531,6 +532,7 @@ export const ContactProfile = ({
                     detailRequest={detailRequest}
                     onDetailRequestDone={spendDetailRequest}
                   />
+                  <ConnectionsCard contactId={id} />
                 </div>
               )}
 
