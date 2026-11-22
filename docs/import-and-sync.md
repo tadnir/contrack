@@ -128,8 +128,8 @@ see [Review possible duplicates](duplicates.md#review-possible-duplicates).
 ## Connectors
 
 A connector syncs who you talk to and your address book. It reads your
-calendar, a mailbox, a CardDAV server, or a Google account on a schedule, and
-adds contacts, meetings, and email to your network. Contrack connects from your
+calendar, a mailbox, a CardDAV server, a Google account, or WhatsApp on a
+schedule, and adds contacts, meetings, email, and messages to your network. Contrack connects from your
 own server.
 
 ![Settings, Connectors: Calendar, Mailbox (IMAP), and Google Workspace, each with a Connect button](images/connectors.png)
@@ -138,10 +138,10 @@ To add a connector:
 
 1. Open **Settings → Connectors**.
 2. Select **Connect** beside **Calendar**, **Mailbox (IMAP)**, **Google
-   Workspace**, or **CardDAV**. If you already have a connector, select **Add
+   Workspace**, **CardDAV**, or **WhatsApp**. If you already have a connector, select **Add
    connector** and choose the kind.
-3. Fill in the form. For a calendar, a mailbox, or CardDAV, select **Test
-   connection** to check it.
+3. Fill in the form. For a calendar, a mailbox, CardDAV, or WhatsApp, select
+   **Test connection** to check it.
 4. Select **Connect**. Google has its own steps, see
    [Google Workspace](#google-workspace).
 
@@ -152,7 +152,7 @@ saves the mailbox anyway. Its card shows **Error** with the server's message,
 and Contrack tries again after one sync interval. A wrong password is not
 saved.
 
-The **Calendar**, **Mailbox (IMAP)**, and **CardDAV** connectors refuse an
+The **Calendar**, **Mailbox (IMAP)**, **CardDAV**, and **WhatsApp** connectors refuse an
 address on a private network, such as a server in your home. The server
 variable `CONNECTORS_ALLOW_PRIVATE_HOSTS=true` turns this check off, see the
 [Configuration reference](configuration.md#environment-variables).
@@ -345,18 +345,37 @@ contact in Contrack later uploads it again as a new card), and moving a
 contact to the Trash in Contrack never deletes the contact on your CardDAV
 server.
 
+### WhatsApp
+
+The WhatsApp connector logs the days you messaged each contact in a direct
+chat. It reads a [whatsapp-mcp](https://github.com/tadnir/mcp-whatsapp)
+server that you run, linked to your own account as a companion device, through
+that server's `list_chat_activity` tool. Each account in Contrack adds its own
+server, so people sharing one instance never see each other's chats.
+
+1. In the form, enter the server's address, such as
+   `https://mcp.example.com/whatsapp/mcp`, and its API key.
+2. Check the **Time zone**, which decides where each day starts. It defaults
+   to your browser's zone.
+3. Select **Test connection**, then **Connect**.
+
+Each chat day becomes one **WhatsApp messages** entry on the contact's
+timeline, which resets their stay-in-touch cadence. Contacts are matched by
+phone number. Someone you messaged on enough days who is not a contact yet is
+suggested as a new person. Groups are left out.
+
 ### Sync options
 
-| Option                                                                           | Connectors                | Default      |
-| -------------------------------------------------------------------------------- | ------------------------- | ------------ |
-| **Sync schedule**: 15 min, 30 min, Hourly, or Daily                              | All                       | 30 min       |
-| **Sync direction**: Two-way sync or Pull only                                    | CardDAV                   | Two-way sync |
-| **First sync goes back**: 30 days, 90 days, or 1 year                            | Calendar, Mailbox, Google | 90 days      |
-| **Skip events with more than** a number of attendees                             | Calendar                  | 25           |
-| **Include event descriptions**: copy agenda and notes into the meeting           | Calendar                  | Off          |
-| **Roll up emails per contact per day**: one timeline entry a day for each person | Mailbox, Google           | On           |
-| **Suggest a new person after** a number of meetings or messages, from 1 to 10    | Calendar, Mailbox, Google | 3            |
-| **Generate AI summaries** (Google: **AI message summaries**)                     | Mailbox, Google           | Off          |
+| Option                                                                           | Connectors                          | Default      |
+| -------------------------------------------------------------------------------- | ----------------------------------- | ------------ |
+| **Sync schedule**: 15 min, 30 min, Hourly, or Daily                              | All                                 | 30 min       |
+| **Sync direction**: Two-way sync or Pull only                                    | CardDAV                             | Two-way sync |
+| **First sync goes back**: 30 days, 90 days, or 1 year                            | Calendar, Mailbox, Google, WhatsApp | 90 days      |
+| **Skip events with more than** a number of attendees                             | Calendar                            | 25           |
+| **Include event descriptions**: copy agenda and notes into the meeting           | Calendar                            | Off          |
+| **Roll up emails per contact per day**: one timeline entry a day for each person | Mailbox, Google                     | On           |
+| **Suggest a new person after** a number of meetings or messages, from 1 to 10    | Calendar, Mailbox, Google, WhatsApp | 3            |
+| **Generate AI summaries** (Google: **AI message summaries**)                     | Mailbox, Google                     | Off          |
 
 A sender such as `no-reply@` or `notifications@` is never suggested, and
 neither is anyone on bulk mail (a newsletter or a mailing list) or on a message
@@ -432,9 +451,11 @@ contact you had before you connected: it never writes over them again.
   Message bodies only for AI summaries.
 - **CardDAV:** contacts with their photos. In two-way mode, contacts you add
   or edit after connecting are also written back to the address book.
+- **WhatsApp:** for each direct chat, the phone number, the name, and how many
+  messages were sent and received each day. Never message text or groups.
 
-Contrack stores the mailbox password, the CardDAV password, and the Google
-sign-in encrypted with the instance's key. The key is the file `secret.key` in
+Contrack stores the mailbox password, the CardDAV password, the WhatsApp
+server key, and the Google sign-in encrypted with the instance's key. The key is the file `secret.key` in
 the data folder, or the `CONTRACK_SECRET_KEY` variable. Backups hold the
 database but not the key, so keep a copy of `secret.key` with them, see
 [Backups and restore](self-hosting.md#backups-and-restore). Without the key,
