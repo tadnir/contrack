@@ -13,6 +13,7 @@ import {
   Globe,
   Loader2,
   Mail,
+  MessageCircle,
   type LucideIcon,
 } from "lucide-react";
 import { Modal } from "../../../components/ui/Modal";
@@ -32,6 +33,7 @@ export const KIND_ICONS: Record<ConnectorKind, LucideIcon> = {
   imap: Mail,
   google: Globe,
   carddav: BookUser,
+  whatsapp: MessageCircle,
 };
 
 /** One kind of connector: a tile that opens its form. */

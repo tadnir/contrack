@@ -23,6 +23,9 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
+- A WhatsApp connector logs the days you messaged each contact in a direct
+  chat, from a whatsapp-mcp server you run. It reads per-day message counts
+  only, never message text or groups.
 - AVIF photos, and HEIC photos, the format an iPhone takes, work in an
   import, as a contact's photo and as your account photo. Your browser turns
   each into a JPEG before it sends it, so the server still reads no HEIF

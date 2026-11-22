@@ -18,6 +18,7 @@ import { CalendarFormModal } from "./CalendarFormModal";
 import { ImapFormModal } from "./ImapFormModal";
 import { GoogleFormModal } from "./GoogleFormModal";
 import { CarddavFormModal } from "./CarddavFormModal";
+import { WhatsappFormModal } from "./WhatsappFormModal";
 import { RunHistoryDrawer } from "./RunHistoryDrawer";
 import { SettingsHeaderActions } from "../SettingsHeader";
 import { useHashTarget } from "../SettingRow";
@@ -58,6 +59,7 @@ export const ConnectorsView: React.FC = () => {
   const [imapModalOpen, setImapModalOpen] = useState(false);
   const [googleModalOpen, setGoogleModalOpen] = useState(false);
   const [carddavModalOpen, setCarddavModalOpen] = useState(false);
+  const [whatsappModalOpen, setWhatsappModalOpen] = useState(false);
   const [editingConnector, setEditingConnector] =
     useState<ConnectorSummary | null>(null);
   const [historyDrawerOpen, setHistoryDrawerOpen] = useState(false);
@@ -103,6 +105,8 @@ export const ConnectorsView: React.FC = () => {
       setGoogleModalOpen(true);
     } else if (kind === "carddav") {
       setCarddavModalOpen(true);
+    } else if (kind === "whatsapp") {
+      setWhatsappModalOpen(true);
     }
   };
 
@@ -116,6 +120,8 @@ export const ConnectorsView: React.FC = () => {
       setGoogleModalOpen(true);
     } else if (c.kind === "carddav") {
       setCarddavModalOpen(true);
+    } else if (c.kind === "whatsapp") {
+      setWhatsappModalOpen(true);
     }
   };
 
@@ -303,6 +309,17 @@ export const ConnectorsView: React.FC = () => {
         }}
         connector={
           editingConnector?.kind === "carddav" ? editingConnector : null
+        }
+      />
+
+      <WhatsappFormModal
+        isOpen={whatsappModalOpen}
+        onClose={() => {
+          setWhatsappModalOpen(false);
+          setEditingConnector(null);
+        }}
+        connector={
+          editingConnector?.kind === "whatsapp" ? editingConnector : null
         }
       />
 
