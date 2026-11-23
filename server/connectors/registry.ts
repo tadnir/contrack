@@ -11,6 +11,7 @@ import { icsAdapter } from "./adapters/ics.ts";
 import { imapAdapter } from "./adapters/imap.ts";
 import { googleAdapter } from "./adapters/google.ts";
 import { carddavAdapter } from "./adapters/carddav.ts";
+import { whatsappAdapter } from "./adapters/whatsapp.ts";
 
 const adapters = new Map<ConnectorKind, ConnectorAdapter<unknown, unknown>>();
 
@@ -26,6 +27,9 @@ registerAdapter(imapAdapter as unknown as ConnectorAdapter<unknown, unknown>);
 registerAdapter(googleAdapter as unknown as ConnectorAdapter<unknown, unknown>);
 registerAdapter(
   carddavAdapter as unknown as ConnectorAdapter<unknown, unknown>,
+);
+registerAdapter(
+  whatsappAdapter as unknown as ConnectorAdapter<unknown, unknown>,
 );
 
 export function getAdapter(
@@ -85,6 +89,15 @@ export function kindsFor(
       label: "CardDAV",
       description:
         "Sync contacts two-way or one-way with Nextcloud, iCloud, Fastmail, Radicale or Baïkal",
+      capabilities: {
+        schedule: true,
+      },
+    },
+    {
+      kind: "whatsapp",
+      label: "WhatsApp",
+      description:
+        "Log the days you messaged each contact, from a WhatsApp MCP server",
       capabilities: {
         schedule: true,
       },
