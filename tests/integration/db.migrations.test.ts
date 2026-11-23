@@ -97,6 +97,14 @@ const ADDED_SINCE_FIXTURE = [
   // 0007_photos_not_read: imports and import_rows gain a column each
   "imports",
   "import_rows",
+  // 0008_connections, and the owner propagation made again
+  "contact_connections",
+  "idx_contact_connections_owner_contact",
+  "idx_contact_connections_owner_related",
+  "contact_connections_owner_fill",
+  "contact_connections_owner_check",
+  "contact_connections_pair_check",
+  "contacts_owner_propagate",
 ];
 
 interface MasterRow {
@@ -237,6 +245,7 @@ describe("a new database", () => {
       "0005_address_change_links",
       "0006_source_origin",
       "0007_photos_not_read",
+      "0008_connections",
     ]);
     const addr = dev
       .prepare(

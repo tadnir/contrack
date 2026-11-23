@@ -8,7 +8,13 @@
  */
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { Ellipsis, PenLine, SlidersHorizontal, UserPlus } from "lucide-react";
+import {
+  Ellipsis,
+  Network,
+  PenLine,
+  SlidersHorizontal,
+  UserPlus,
+} from "lucide-react";
 import { ActionMenu } from "../../../components/ui/ActionMenu";
 import { PageHeader } from "../../../components/layout/PageHeader";
 import { useMediaQuery } from "../../../hooks/useMediaQuery";
@@ -122,6 +128,12 @@ export const Masthead = ({
                 label: "New contact",
                 icon: UserPlus,
                 onSelect: () => navigate("/?new=1"),
+              },
+              {
+                id: "connections",
+                label: NAMES.connections.label,
+                icon: Network,
+                onSelect: () => navigate("/pulse/connections"),
               },
               {
                 id: "customize",
