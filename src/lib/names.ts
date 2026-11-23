@@ -25,6 +25,12 @@ export const NAMES = {
     title: "Pulse",
     description: "Follow-ups that are due and relationships that need you",
   },
+  connections: {
+    label: "Connections",
+    title: "Connections",
+    description:
+      "Who knows whom: the ties you stated and the people who share notes",
+  },
   map: {
     label: "Map",
     title: "Map",

@@ -786,6 +786,7 @@ export const SETTINGS_PAGES: SettingsPage[] = [
       "fastmail",
       "radicale",
       "baikal",
+      "whatsapp",
     ],
     rows: [
       {
@@ -806,6 +807,7 @@ export const SETTINGS_PAGES: SettingsPage[] = [
           "fastmail",
           "radicale",
           "baikal",
+          "whatsapp",
         ],
       },
     ],

@@ -77,6 +77,11 @@ import { RailTooltip } from "../../components/ui/RailTooltip";
 const DuplicatesPage = React.lazy(() =>
   import("./pages/DuplicatesPage").then((m) => ({ default: m.DuplicatesPage })),
 );
+const ConnectionsPage = React.lazy(() =>
+  import("./pages/ConnectionsPage").then((m) => ({
+    default: m.ConnectionsPage,
+  })),
+);
 
 /** The single keys that walk or act on the selected Up next row. */
 const QUEUE_KEYS = new Set(["j", "k", "d", "s", "l"]);
@@ -746,6 +751,7 @@ export const PulseView = () => {
       {/* No Suspense here: the app's page boundary (`App.tsx`) keeps Pulse
           on screen while the code loads, with no blank flash. */}
       <Route path="duplicates" element={<DuplicatesPage />} />
+      <Route path="connections" element={<ConnectionsPage />} />
       <Route
         path="suggestions"
         element={<Navigate to="/pulse/duplicates" replace />}

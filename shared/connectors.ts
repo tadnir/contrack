@@ -1,6 +1,6 @@
 /** Connector types and constants, for the server and the client. */
 
-export type ConnectorKind = "ics" | "imap" | "google" | "carddav";
+export type ConnectorKind = "ics" | "imap" | "google" | "carddav" | "whatsapp";
 
 export type ConnectorStatus = "active" | "paused" | "error" | "needs_reauth";
 
@@ -115,6 +115,12 @@ const CONNECTOR_KINDS: Record<
     description:
       "Sync contacts with Nextcloud, Radicale, Baïkal, iCloud or Fastmail.",
     viaLabel: "via CardDAV",
+  },
+  whatsapp: {
+    label: "WhatsApp",
+    description:
+      "Log the days you messaged each contact, from a WhatsApp MCP server.",
+    viaLabel: "via WhatsApp",
   },
 };
 

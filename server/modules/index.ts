@@ -20,6 +20,7 @@ import { contactsModule } from "./contacts/index.ts";
 import { connectorsModule } from "./connectors/index.ts";
 import { importsModule } from "./imports/index.ts";
 import { interactionsModule } from "./interactions/index.ts";
+import { networkModule } from "./network/index.ts";
 import { dedupeModule } from "./dedupe/index.ts";
 import { actionItemsModule } from "./action-items/index.ts";
 import { dashboardModule } from "./dashboard/index.ts";
@@ -42,6 +43,7 @@ export const MODULES: readonly ContrackModule[] = [
   connectorsModule,
   importsModule,
   interactionsModule,
+  networkModule,
   dedupeModule,
   actionItemsModule,
   dashboardModule,
